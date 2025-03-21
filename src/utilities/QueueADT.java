@@ -1,10 +1,10 @@
+//Jacobs Version 2025-03-21
 package utilities;
 
 import java.util.NoSuchElementException;
 
 /**
  * A simple and efficient Queue interface that defines how a queue works.
- * Queues follow the First-In, First-Out (FIFO) rule: 
  * the first element added is the first to be removed.
  *
  * @param <T> The type of elements stored in the queue.
@@ -14,7 +14,7 @@ public interface QueueADT<T> {
     /**
      * Adds an item to the back of the queue.
      *
-     * @param item The element to add.
+     * @param item the element to add.
      * @throws NullPointerException if the item is null.
      */
     void enqueue(T item);
