@@ -1,103 +1,126 @@
 package implementations;
 
-import utilities.ListADT;
 import utilities.Iterator;
-
+import utilities.ListADT;
 import java.util.NoSuchElementException;
-import java.util.ConcurrentModificationException;
-import java.util.Objects;
 
-/**
- * A custom implementation of a generic ArrayList.
- *
- * @param <T> the type of elements stored in the list
- */
-public class MyArrayList<T> implements ListADT<T> {
+public class MyArrayList<E> implements ListADT<E> {
+    private Object[] data;
+    private int count;
+    private final int DEFAULT_CAPACITY = 10;
 
-    private static final int DEFAULT_CAPACITY = 10;
-    private T[] elements;
-    private int size;
-    private int modCount;
-
-    @SuppressWarnings("unchecked")
     public MyArrayList() {
-        elements = (T[]) new Object[DEFAULT_CAPACITY];
-        size = 0;
-        modCount = 0; 
+        data = new Object[DEFAULT_CAPACITY];
+        count = 0;
+    }
+
+    private void resizeIfNeeded() {
+        if (count == data.length) {
+            Object[] newData = new Object[data.length * 2];
+            for (int i = 0; i < data.length; i++) {
+                newData[i] = data[i];
+            }
+            data = newData;
+        }
     }
 
     @Override
-    public int size() {
-        return size;
+    public boolean add(E toAdd) throws NullPointerException {
+        if (toAdd == null) throw new NullPointerException("Null values not allowed");
+        resizeIfNeeded();
+        data[count] = toAdd;
+        count++;
+        return true;
+    }
+
+    @Override
+    public boolean add(int index, E toAdd) throws NullPointerException, IndexOutOfBoundsException {
+        if (toAdd == null) throw new NullPointerException("Null values not allowed");
+        if (index < 0 || index > count) throw new IndexOutOfBoundsException("Index out of range");
+
+        resizeIfNeeded();
+        for (int i = count; i > index; i--) {
+            data[i] = data[i - 1];
+        }
+        data[index] = toAdd;
+        count++;
+        return true;
+    }
+
+    @Override
+    public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
+        if (toAdd == null) throw new NullPointerException("List cannot be null");
+
+        Iterator<? extends E> it = toAdd.iterator();
+        while (it.hasNext()) {
+            add(it.next());
+        }
+        return true;
     }
 
     @Override
     public void clear() {
-        for (int i = 0; i < size; i++) {
-            elements[i] = null;
+        data = new Object[DEFAULT_CAPACITY];
+        count = 0;
+    }
+
+    @Override
+    public boolean contains(E toFind) throws NullPointerException {
+        if (toFind == null) throw new NullPointerException("Cannot search for null");
+
+        for (int i = 0; i < count; i++) {
+            if (data[i].equals(toFind)) return true;
         }
-        size = 0;
-        modCount++;
+        return false;
     }
 
     @Override
-    public boolean add(int index, T toAdd) {
-        if (toAdd == null) throw new NullPointerException("Null values not allowed.");
-        if (index < 0 || index > size) throw new IndexOutOfBoundsException();
+    public E get(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index >= count) throw new IndexOutOfBoundsException("Invalid index");
+        return (E) data[index];
+    }
 
-        ensureCapacity();
-        for (int i = size; i > index; i--) {
-            elements[i] = elements[i - 1];
+    @Override
+    public boolean isEmpty() {
+        return count == 0;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<E>() {
+            private int pos = 0;
+
+            @Override
+            public boolean hasNext() {
+                return pos < count;
+            }
+
+            @Override
+            public E next() throws NoSuchElementException {
+                if (!hasNext()) throw new NoSuchElementException("No more elements");
+                return (E) data[pos++];
+            }
+        };
+    }
+
+    @Override
+    public E remove(int index) throws IndexOutOfBoundsException {
+        if (index < 0 || index >= count) throw new IndexOutOfBoundsException("Invalid index");
+
+        E removed = (E) data[index];
+        for (int i = index; i < count - 1; i++) {
+            data[i] = data[i + 1];
         }
-        elements[index] = toAdd;
-        size++;
-        modCount++;
-        return true;
-    }
-
-    @Override
-    public boolean add(T toAdd) {
-        if (toAdd == null) throw new NullPointerException("Null values not allowed.");
-        ensureCapacity();
-        elements[size++] = toAdd;
-        modCount++;
-        return true;
-    }
-
-    @Override
-    public boolean addAll(ListADT<? extends T> toAdd) {
-        if (toAdd == null) throw new NullPointerException("Input list cannot be null.");
-
-        for (int i = 0; i < toAdd.size(); i++) {
-            this.add(toAdd.get(i));
-        }
-        return true;
-    }
-
-    @Override
-    public T get(int index) {
-        checkBounds(index);
-        return elements[index];
-    }
-
-    @Override
-    public T remove(int index) {
-        checkBounds(index);
-        T removed = elements[index];
-        for (int i = index; i < size - 1; i++) {
-            elements[i] = elements[i + 1];
-        }
-        elements[--size] = null;
-        modCount++;
+        count--;
         return removed;
     }
 
     @Override
-    public T remove(T toRemove) {
-        if (toRemove == null) throw new NullPointerException("Null values not allowed.");
+    public E remove(E toRemove) throws NullPointerException {
+        if (toRemove == null) throw new NullPointerException("Cannot remove null");
 
-        for (int i = 0; i < size; i++) {
-            if (Objects.equals(elements[i], toRemove)) {
+        for (int i = 0; i < count; i++) {
+            if (data[i].equals(toRemove)) {
                 return remove(i);
             }
         }
@@ -105,81 +128,45 @@ public class MyArrayList<T> implements ListADT<T> {
     }
 
     @Override
-    public T set(int index, T toChange) {
-        if (toChange == null) throw new NullPointerException("Null values not allowed.");
-        checkBounds(index);
-        T old = elements[index];
-        elements[index] = toChange;
-        modCount++;
+    public E set(int index, E toChange) throws NullPointerException, IndexOutOfBoundsException {
+        if (toChange == null) throw new NullPointerException("Null not allowed");
+        if (index < 0 || index >= count) throw new IndexOutOfBoundsException("Index out of range");
+
+        E old = (E) data[index];
+        data[index] = toChange;
         return old;
     }
 
     @Override
-    public boolean isEmpty() {
-        return size == 0;
-    }
-
-    @Override
-    public boolean contains(T toFind) {
-        if (toFind == null) throw new NullPointerException("Null values not allowed.");
-        for (int i = 0; i < size; i++) {
-            if (Objects.equals(elements[i], toFind)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public T[] toArray(T[] toHold) {
-        if (toHold == null) throw new NullPointerException("Input array cannot be null.");
-        if (toHold.length < size) {
-            return java.util.Arrays.copyOf(elements, size, (Class<? extends T[]>) toHold.getClass());
-        }
-        System.arraycopy(elements, 0, toHold, 0, size);
-        if (toHold.length > size) {
-            toHold[size] = null;
-        }
-        return toHold;
+    public int size() {
+        return count;
     }
 
     @Override
     public Object[] toArray() {
-        return java.util.Arrays.copyOf(elements, size);
+        Object[] copy = new Object[count];
+        for (int i = 0; i < count; i++) {
+            copy[i] = data[i];
+        }
+        return copy;
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return new MyArrayListIterator();
-    }
+    public E[] toArray(E[] toHold) throws NullPointerException {
+        if (toHold == null) throw new NullPointerException("Input array is null");
 
-    private void ensureCapacity() {
-        if (size == elements.length) {
-            elements = java.util.Arrays.copyOf(elements, elements.length * 2);
-        }
-    }
-
-    private void checkBounds(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        }
-    }
-
-    private class MyArrayListIterator implements Iterator<T> {
-        private int currentIndex = 0;
-        private final int expectedModCount = modCount;
-
-        @Override
-        public boolean hasNext() {
-            if (expectedModCount != modCount)
-                throw new ConcurrentModificationException("List was modified.");
-            return currentIndex < size;
+        if (toHold.length < count) {
+            toHold = (E[]) java.lang.reflect.Array.newInstance(toHold.getClass().getComponentType(), count);
         }
 
-        @Override
-        public T next() {
-            if (!hasNext()) throw new NoSuchElementException();
-            return elements[currentIndex++];
+        for (int i = 0; i < count; i++) {
+            toHold[i] = (E) data[i];
         }
+
+        if (toHold.length > count) {
+            toHold[count] = null;
+        }
+
+        return toHold;
     }
 }
