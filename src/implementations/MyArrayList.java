@@ -2,7 +2,6 @@ package implementations;
 
 import utilities.Iterator;
 import utilities.ListADT;
-
 import java.util.NoSuchElementException;
 
 public class MyArrayList<E> implements ListADT<E> {
@@ -56,7 +55,6 @@ public class MyArrayList<E> implements ListADT<E> {
         while (it.hasNext()) {
             add(it.next());
         }
-
         return true;
     }
 
