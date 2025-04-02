@@ -1,13 +1,23 @@
 package implementations;
 
-import utilities.Iterator;
-import utilities.ListADT;
+import utilities.IteratorADT;
+import utilities.ArrayListADT;
 import java.util.NoSuchElementException;
 
-public class MyDLL<E> implements ListADT<E> {
+/**
+ * MyDLL is an implementation of the ArrayListADT interface using a doubly linked list.
+ * It supports efficient insertions and deletions from both ends and provides
+ * indexed access to elements.
+ *
+ * @param <E> the type of elements stored in the list
+ */
+public class MyDLL<E> implements ArrayListADT<E> {
     private MyDLLNode<E> head, tail;
     private int size;
 
+    /**
+     * Constructs an empty doubly linked list.
+     */
     public MyDLL() {
         head = tail = null;
         size = 0;
@@ -61,9 +71,9 @@ public class MyDLL<E> implements ListADT<E> {
     }
 
     @Override
-    public boolean addAll(ListADT<? extends E> list) {
+    public boolean addAll(ArrayListADT<? extends E> list) {
         if (list == null) throw new NullPointerException();
-        Iterator<? extends E> it = list.iterator();
+        IteratorADT<? extends E> it = list.iterator();
         while (it.hasNext()) add(it.next());
         return true;
     }
@@ -97,14 +107,16 @@ public class MyDLL<E> implements ListADT<E> {
     }
 
     @Override
-    public Iterator<E> iterator() {
-        return new Iterator<E>() {
+    public IteratorADT<E> iterator() {
+        return new IteratorADT<E>() {
             private MyDLLNode<E> pointer = head;
 
+            @Override
             public boolean hasNext() {
                 return pointer != null;
             }
 
+            @Override
             public E next() {
                 if (!hasNext()) throw new NoSuchElementException();
                 E val = pointer.getElement();

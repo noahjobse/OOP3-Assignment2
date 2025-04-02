@@ -12,7 +12,7 @@ import java.io.Serializable;
  * 
  * @param <E> The type of elements this list holds.
  */
-public interface ListADT<E> extends Serializable
+public interface ArrayListADT<E> extends Serializable
 {
 	/**
 	 * The size method will return the current element count contained in the list.
@@ -76,7 +76,7 @@ public interface ListADT<E> extends Serializable
 	 *                              and the list implementation does not support
 	 *                              having <code>null</code> elements.
 	 */
-	public boolean addAll( ListADT<? extends E> toAdd ) throws NullPointerException;
+	public boolean addAll( ArrayListADT<? extends E> toAdd ) throws NullPointerException;
 
 	/**
 	 * Returns the element at the specified position in this list.
@@ -182,5 +182,5 @@ public interface ListADT<E> extends Serializable
 	 *         The return is of type <code>linearUtilities.Iterator<E></code>, not
 	 *         <code>java.util.Iterator</code>.
 	 */
-	public Iterator<E> iterator();
+	public IteratorADT<E> iterator();
 }

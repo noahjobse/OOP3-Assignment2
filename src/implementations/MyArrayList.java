@@ -1,10 +1,10 @@
 package implementations;
 
-import utilities.Iterator;
-import utilities.ListADT;
+import utilities.IteratorADT;
+import utilities.ArrayListADT;
 import java.util.NoSuchElementException;
 
-public class MyArrayList<E> implements ListADT<E> {
+public class MyArrayList<E> implements ArrayListADT<E> {
     private Object[] data;
     private int count;
     private final int DEFAULT_CAPACITY = 10;
@@ -25,12 +25,14 @@ public class MyArrayList<E> implements ListADT<E> {
     }
 
     @Override
-    public boolean add(E toAdd) throws NullPointerException {
-        if (toAdd == null) throw new NullPointerException("Null values not allowed");
-        resizeIfNeeded();
-        data[count] = toAdd;
-        count++;
-        return true;
+    public int size() {
+        return count;
+    }
+
+    @Override
+    public void clear() {
+        data = new Object[DEFAULT_CAPACITY];
+        count = 0;
     }
 
     @Override
@@ -48,10 +50,19 @@ public class MyArrayList<E> implements ListADT<E> {
     }
 
     @Override
-    public boolean addAll(ListADT<? extends E> toAdd) throws NullPointerException {
+    public boolean add(E toAdd) throws NullPointerException {
+        if (toAdd == null) throw new NullPointerException("Null values not allowed");
+        resizeIfNeeded();
+        data[count] = toAdd;
+        count++;
+        return true;
+    }
+
+    @Override
+    public boolean addAll(ArrayListADT<? extends E> toAdd) throws NullPointerException {
         if (toAdd == null) throw new NullPointerException("List cannot be null");
 
-        Iterator<? extends E> it = toAdd.iterator();
+        IteratorADT<? extends E> it = toAdd.iterator();
         while (it.hasNext()) {
             add(it.next());
         }
@@ -59,48 +70,9 @@ public class MyArrayList<E> implements ListADT<E> {
     }
 
     @Override
-    public void clear() {
-        data = new Object[DEFAULT_CAPACITY];
-        count = 0;
-    }
-
-    @Override
-    public boolean contains(E toFind) throws NullPointerException {
-        if (toFind == null) throw new NullPointerException("Cannot search for null");
-
-        for (int i = 0; i < count; i++) {
-            if (data[i].equals(toFind)) return true;
-        }
-        return false;
-    }
-
-    @Override
     public E get(int index) throws IndexOutOfBoundsException {
         if (index < 0 || index >= count) throw new IndexOutOfBoundsException("Invalid index");
         return (E) data[index];
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return count == 0;
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        return new Iterator<E>() {
-            private int pos = 0;
-
-            @Override
-            public boolean hasNext() {
-                return pos < count;
-            }
-
-            @Override
-            public E next() throws NoSuchElementException {
-                if (!hasNext()) throw new NoSuchElementException("No more elements");
-                return (E) data[pos++];
-            }
-        };
     }
 
     @Override
@@ -138,17 +110,18 @@ public class MyArrayList<E> implements ListADT<E> {
     }
 
     @Override
-    public int size() {
-        return count;
+    public boolean isEmpty() {
+        return count == 0;
     }
 
     @Override
-    public Object[] toArray() {
-        Object[] copy = new Object[count];
+    public boolean contains(E toFind) throws NullPointerException {
+        if (toFind == null) throw new NullPointerException("Cannot search for null");
+
         for (int i = 0; i < count; i++) {
-            copy[i] = data[i];
+            if (data[i].equals(toFind)) return true;
         }
-        return copy;
+        return false;
     }
 
     @Override
@@ -168,5 +141,32 @@ public class MyArrayList<E> implements ListADT<E> {
         }
 
         return toHold;
+    }
+
+    @Override
+    public Object[] toArray() {
+        Object[] copy = new Object[count];
+        for (int i = 0; i < count; i++) {
+            copy[i] = data[i];
+        }
+        return copy;
+    }
+
+    @Override
+    public IteratorADT<E> iterator() {
+        return new IteratorADT<E>() {
+            private int pos = 0;
+
+            @Override
+            public boolean hasNext() {
+                return pos < count;
+            }
+
+            @Override
+            public E next() throws NoSuchElementException {
+                if (!hasNext()) throw new NoSuchElementException("No more elements");
+                return (E) data[pos++];
+            }
+        };
     }
 }

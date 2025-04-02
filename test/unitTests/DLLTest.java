@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import implementations.MyArrayList;
 import implementations.MyDLL;
-import utilities.Iterator;
+import utilities.IteratorADT;
 
 /**
  * @author kitty, maryam
@@ -648,7 +648,7 @@ public class DLLTest
 	{
 		boolean expectedBoolean = false;
 		
-		Iterator<Integer> it = myList.iterator();
+		IteratorADT<Integer> it = myList.iterator();
 		boolean actualBoolean = it.hasNext();
 		assertEquals( "Failed to return false.", expectedBoolean, actualBoolean);
 		try
@@ -678,7 +678,7 @@ public class DLLTest
 		myList.add( four );
 		myList.add( five );
 
-		Iterator<Integer> it = myList.iterator();
+		IteratorADT<Integer> it = myList.iterator();
 		boolean actualBoolean = it.hasNext();
 		assertEquals( "Failed to reutrn true.", expectedBoolean, actualBoolean);
 		int expectedValue = one;
