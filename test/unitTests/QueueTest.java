@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import exceptions.EmptyQueueException;
-import utilities.Iterator;
+import utilities.IteratorADT;
 import implementations.MyQueue;
 
 /**
@@ -189,7 +189,7 @@ public class QueueTest
 		queue.enqueue( four );
 		queue.enqueue( five );
 
-		Iterator<Integer> it = queue.iterator();
+		IteratorADT<Integer> it = queue.iterator();
 		
 		assertTrue(it.hasNext());
 		
@@ -217,7 +217,7 @@ public class QueueTest
 	@Test
 	public void testIterator_EmptyQ()
 	{
-		Iterator<Integer> it = queue.iterator();
+		IteratorADT<Integer> it = queue.iterator();
 		
 		assertFalse(it.hasNext());
 		

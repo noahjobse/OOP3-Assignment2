@@ -9,7 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import utilities.Iterator;
+import utilities.IteratorADT;
 import implementations.MyStack;
 
 /**
@@ -245,7 +245,7 @@ public class StackTest
 		stack.push( four );
 		stack.push( five );
 
-		Iterator<Integer> it = stack.iterator();
+		IteratorADT<Integer> it = stack.iterator();
 		
 		assertTrue(it.hasNext());
 		
@@ -272,7 +272,7 @@ public class StackTest
 	@Test
 	public void testIterator_Empty()
 	{
-		Iterator<Integer> it = stack.iterator();
+		IteratorADT<Integer> it = stack.iterator();
 		
 		assertFalse(it.hasNext());
 		
