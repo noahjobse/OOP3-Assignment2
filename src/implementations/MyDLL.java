@@ -17,6 +17,9 @@ public class MyDLL<E> implements ArrayListADT<E> {
 
     /**
      * Constructs an empty doubly linked list.
+     *
+     * Precondition: None
+     * Postcondition: The list is initialized with head and tail set to null, and size set to 0.
      */
     public MyDLL() {
         head = tail = null;
@@ -210,10 +213,28 @@ public class MyDLL<E> implements ArrayListADT<E> {
         return target;
     }
 
+    /**
+     * Validates that the given index is within the valid bounds of the list.
+     *
+     * Precondition: idx is an integer.
+     * Postcondition: If the index is invalid (less than 0 or greater than or equal to size),
+     * an IndexOutOfBoundsException is thrown.
+     *
+     * @param idx the index to validate
+     */
     private void validate(int idx) {
         if (idx < 0 || idx >= size) throw new IndexOutOfBoundsException();
     }
 
+    /**
+     * Retrieves the node at the specified index in the list.
+     *
+     * Precondition: idx is a valid index (0 <= idx < size).
+     * Postcondition: Returns the node located at the specified index.
+     *
+     * @param idx the index of the node to retrieve
+     * @return the node at the given index
+     */
     private MyDLLNode<E> getNode(int idx) {
         MyDLLNode<E> current;
         if (idx < size / 2) {

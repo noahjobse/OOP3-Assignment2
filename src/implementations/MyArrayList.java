@@ -4,16 +4,34 @@ import utilities.IteratorADT;
 import utilities.ArrayListADT;
 import java.util.NoSuchElementException;
 
+/**
+ * MyArrayList is an array-based implementation of the ArrayListADT interface.
+ * It provides dynamic resizing and supports basic list operations like add, remove, and get.
+ *
+ * @param <E> the type of elements stored in the list
+ */
 public class MyArrayList<E> implements ArrayListADT<E> {
     private Object[] data;
     private int count;
     private final int DEFAULT_CAPACITY = 10;
 
+    /**
+     * Constructs an empty list with the default initial capacity.
+     *
+     * Precondition: None
+     * Postcondition: The list is initialized with an internal array of default capacity and count set to 0.
+     */
     public MyArrayList() {
         data = new Object[DEFAULT_CAPACITY];
         count = 0;
     }
 
+    /**
+     * Doubles the capacity of the internal array if the current count equals the array length.
+     *
+     * Precondition: None
+     * Postcondition: If the array was full, it is resized to double its previous capacity and all elements are copied.
+     */
     private void resizeIfNeeded() {
         if (count == data.length) {
             Object[] newData = new Object[data.length * 2];

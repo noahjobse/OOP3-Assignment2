@@ -3,7 +3,29 @@ import implementations.MyStack;
 import exceptions.EmptyQueueException;
 import java.io.*;
 
+/**
+ * The Parser class reads and validates an XML file for properly nested and matched tags.
+ * It uses a stack to track opening tags and queues to report any mismatches,
+ * unexpected tags, or missing closing tags.
+ *
+ * <p>Tags are parsed line by line and categorized as:
+ * - Self-closing tags (ignored)
+ * - Valid opening tags (pushed onto stack)
+ * - Closing tags (matched against the stack or recorded as errors)
+ *
+ * <p>Error messages are printed to standard output if issues are found.
+ * If the XML is valid, a success message is printed.
+ */
 public class Parser {
+
+    /**
+     * Entry point for the XML parser.
+     *
+     * Precondition: A valid file path to an XML file is provided as the first command-line argument.
+     * Postcondition: The file is parsed, and errors (if any) are printed to standard output.
+     *
+     * @param args Command-line arguments, where args[0] should be the path to the XML file
+     */
     public static void main(String[] args) {
         if (args.length < 1) {
             System.out.println("Usage: java Parser <filename>");
@@ -11,14 +33,12 @@ public class Parser {
         }
 
         String filename = args[0];
-        
         File xmlFile = new File(filename);
         if (!xmlFile.exists() || !xmlFile.canRead()) {
             System.out.println("Error: The file does not exist or cannot be read.");
             return;
         }
 
-        
         MyStack<String> stack = new MyStack<>();
         MyQueue<String> errorQ = new MyQueue<>();
         MyQueue<String> extrasQ = new MyQueue<>();
@@ -31,7 +51,7 @@ public class Parser {
                 String trimmed = line.trim();
                 if (trimmed.isEmpty() || (trimmed.startsWith("<?") && trimmed.endsWith("?>"))) {
                     lineNum++;
-                    continue; // ignore blank lines and XML declarations
+                    continue;
                 }
 
                 String[] parts = trimmed.split("(?=<)|(?<=>)");
@@ -39,18 +59,18 @@ public class Parser {
                 for (String part : parts) {
                     if (!part.startsWith("<")) continue;
 
-                    // self-closing tag
+                    // Self-closing tag
                     if (part.matches("<[^>]+/>")) {
                         continue;
                     }
 
-                    // start tag
+                    // Opening tag
                     else if (part.matches("<[^/!][^>]*>")) {
                         String tagName = extractTagName(part);
                         stack.push(tagName);
                     }
 
-                    // end tag
+                    // Closing tag
                     else if (part.matches("</[^>]+>")) {
                         String tagName = extractTagName(part);
 
@@ -58,7 +78,7 @@ public class Parser {
                             if (!stack.isEmpty() && stack.peek().equals(tagName)) {
                                 stack.pop();
                             } else if (!errorQ.isEmpty() && errorQ.peek().equals(tagName)) {
-                                errorQ.dequeue(); // skip it
+                                errorQ.dequeue();
                             } else if (stack.isEmpty()) {
                                 errorQ.enqueue("Line " + lineNum + ": Unexpected </" + tagName + ">");
                             } else {
@@ -81,7 +101,6 @@ public class Parser {
                                 }
                             }
                         } catch (EmptyQueueException e) {
-                            // should not occur here, but handled just in case
                             System.out.println("Unexpected queue error on line " + lineNum);
                         }
                     }
@@ -90,9 +109,9 @@ public class Parser {
                 lineNum++;
             }
 
-            // Remaining unclosed tags
+            // Handle any tags left open
             while (!stack.isEmpty()) {
-                errorQ.enqueue("Unclosed tag: <" + stack.pop() + ">");
+                errorQ.enqueue("Unclosed tag (end of file): <" + stack.pop() + ">");
             }
 
             boolean errorsFound = false;
@@ -124,6 +143,15 @@ public class Parser {
         }
     }
 
+    /**
+     * Extracts the tag name from a full tag string, removing angle brackets and attributes.
+     *
+     * Precondition: The input is a well-formed XML tag like {@code <tag>} or {@code </tag>}.
+     * Postcondition: Returns the tag name without angle brackets or attributes.
+     *
+     * @param tag the full XML tag string
+     * @return the clean tag name
+     */
     private static String extractTagName(String tag) {
         tag = tag.replaceAll("<|>|/", "").trim();
         if (tag.contains(" ")) {
